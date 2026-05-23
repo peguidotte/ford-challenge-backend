@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ford-challenge-backend
+  datasource:
+    url: ${APP_DB_URL:jdbc:postgresql://localhost:5432/ford_challenge}
+    username: ${APP_DB_USERNAME:ford}
+    password: ${APP_DB_PASSWORD:ford123}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  integration:
+    fipe:
+      base-url: ${FIPE_BASE_URL:https://fipe.parallelum.com.br/api/v2}
+      token: ${FIPE_TOKEN:}
+      timeout-millis: 5000
+    carapi:
+      base-url: ${CAR_API_BASE_URL:https://carapi.app/api}
+      bearer-token: ${CAR_API_BEARER_TOKEN:}
+      timeout-millis: 5000
