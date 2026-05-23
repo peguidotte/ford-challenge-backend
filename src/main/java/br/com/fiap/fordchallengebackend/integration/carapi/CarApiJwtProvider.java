@@ -2,7 +2,6 @@ package br.com.fiap.fordchallengebackend.integration.carapi;
 
 import br.com.fiap.fordchallengebackend.config.AppProperties;
 import br.com.fiap.fordchallengebackend.exception.ExternalIntegrationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class CarApiJwtProvider {
@@ -112,7 +112,7 @@ public class CarApiJwtProvider {
                 return Optional.empty();
             }
             return Optional.of(Instant.ofEpochSecond(node.get("exp").asLong()));
-        } catch (com.fasterxml.jackson.core.JsonProcessingException | IllegalArgumentException ex) {
+        } catch (Exception ex) {
             return Optional.empty();
         }
     }

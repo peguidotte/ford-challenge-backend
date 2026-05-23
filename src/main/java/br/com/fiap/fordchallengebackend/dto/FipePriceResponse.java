@@ -1,14 +1,12 @@
 package br.com.fiap.fordchallengebackend.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public record FipePriceResponse(
-    @JsonProperty("brand") String brand,
-    @JsonProperty("model") String model,
-    @JsonProperty("modelYear") Integer modelYear,
-    @JsonProperty("fuel") String fuel,
-    @JsonProperty("codeFipe") String codeFipe,
-    @JsonProperty("price") String price,
-    @JsonProperty("referenceMonth") String referenceMonth
+    String brand,
+    String model,
+    Integer modelYear,
+    String fuel,
+    String codeFipe,
+    String price,
+    String referenceMonth
 ) {
 }

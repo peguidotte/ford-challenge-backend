@@ -1,8 +1,6 @@
 package br.com.fiap.fordchallengebackend.integration.carapi;
 
 import br.com.fiap.fordchallengebackend.exception.ExternalIntegrationException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class CarApiClient {
@@ -169,7 +170,7 @@ public class CarApiClient {
 
         if (payload.isArray()) {
             return StreamSupport.stream(payload.spliterator(), false)
-                .map(node -> OBJECT_MAPPER.convertValue(node, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+                .map(node -> OBJECT_MAPPER.convertValue(node, new TypeReference<Map<String, Object>>() {
                 }))
                 .toList();
         }
@@ -177,7 +178,7 @@ public class CarApiClient {
         if (payload.isObject() && payload.has("data") && payload.get("data").isArray()) {
             var data = payload.get("data");
             return StreamSupport.stream(data.spliterator(), false)
-                .map(node -> OBJECT_MAPPER.convertValue(node, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+                .map(node -> OBJECT_MAPPER.convertValue(node, new TypeReference<Map<String, Object>>() {
                 }))
                 .toList();
         }
@@ -214,7 +215,7 @@ public class CarApiClient {
         if (payload == null || payload.isNull()) {
             return Map.of();
         }
-        return OBJECT_MAPPER.convertValue(payload, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+        return OBJECT_MAPPER.convertValue(payload, new TypeReference<Map<String, Object>>() {
         });
     }
 
