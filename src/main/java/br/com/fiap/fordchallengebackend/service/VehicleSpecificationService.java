@@ -22,12 +22,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class VehicleSpecificationService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(VehicleSpecificationService.class);
     private static final String NOT_AVAILABLE = "Nao disponivel";
     private static final String DEFAULT_VEHICLE_TYPE = "cars";
 
@@ -74,12 +77,6 @@ public class VehicleSpecificationService {
         for (var requested : requestedAttributes) {
             var normalized = normalizeKey(requested);
 
-            if (overrideMap.containsKey(normalized)) {
-                resolvedAttributes.put(requested, overrideMap.get(normalized));
-                mergedSources.put(requested, "INTERNAL_OVERRIDE");
-                continue;
-            }
-
             var mappedFipeKey = mapToFipeCanonical(normalized);
             if (normalizedFipeData.containsKey(mappedFipeKey)) {
                 resolvedAttributes.put(requested, normalizedFipeData.get(mappedFipeKey));
@@ -91,6 +88,12 @@ public class VehicleSpecificationService {
             if (normalizedCarApiData.containsKey(mappedCarApiKey)) {
                 resolvedAttributes.put(requested, normalizedCarApiData.get(mappedCarApiKey));
                 mergedSources.put(requested, "CAR_API");
+                continue;
+            }
+
+            if (overrideMap.containsKey(normalized)) {
+                resolvedAttributes.put(requested, overrideMap.get(normalized));
+                mergedSources.put(requested, "INTERNAL_DATA_SOURCE");
                 continue;
             }
 
@@ -119,6 +122,18 @@ public class VehicleSpecificationService {
                 null
             );
         } catch (ExternalIntegrationException ex) {
+            var causeType = ex.getCause() != null ? ex.getCause().getClass().getSimpleName() : "n/a";
+            var causeMessage = ex.getCause() != null ? ex.getCause().getMessage() : "n/a";
+            LOGGER.warn(
+                "CarAPI indisponivel para {} {} {} (status={}, causeType={}, causeMessage={}): {}",
+                request.brand(),
+                request.model(),
+                request.version(),
+                ex.upstreamStatus(),
+                causeType,
+                causeMessage,
+                ex.getMessage()
+            );
             return Map.of();
         }
     }
@@ -162,6 +177,14 @@ public class VehicleSpecificationService {
             putIfPresent(data, "Referencia FIPE", priceResponse.referenceMonth());
             return data;
         } catch (RuntimeException ex) {
+            LOGGER.warn(
+                "FIPE indisponivel para {} {} {} (reference={}): {}",
+                request.brand(),
+                request.model(),
+                request.version(),
+                request.reference(),
+                ex.getMessage()
+            );
             return Map.of();
         }
     }

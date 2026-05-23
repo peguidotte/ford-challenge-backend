@@ -50,7 +50,7 @@ class VehicleSpecificationControllerTest {
             "Ranger",
             "Raptor",
             Map.of("Motor", "V6 3.0L Nano bi turbo"),
-            Map.of("Motor", "INTERNAL_OVERRIDE"),
+            Map.of("Motor", "INTERNAL_DATA_SOURCE"),
             OffsetDateTime.parse("2026-05-23T12:00:00Z")
         );
 
@@ -70,7 +70,7 @@ class VehicleSpecificationControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.brand").value("Ford"))
             .andExpect(jsonPath("$.attributes.Motor").value("V6 3.0L Nano bi turbo"))
-            .andExpect(jsonPath("$.sources.Motor").value("INTERNAL_OVERRIDE"));
+                .andExpect(jsonPath("$.sources.Motor").value("INTERNAL_DATA_SOURCE"));
     }
 
     @Test

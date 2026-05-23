@@ -42,7 +42,7 @@ class VehicleSpecificationServiceTest {
     private VehicleSpecificationService service;
 
     @Test
-    void shouldResolveAttributesWithOverridePriorityAndFillMissing() {
+    void shouldResolveAttributesWithFipeAndCarApiPriorityAndFallbackToInternalDataSource() {
         when(carApiClient.searchTechnicalAttributes("Ford", "Ranger", "Raptor", null))
             .thenReturn(Map.of("Motor", "V6 3.0"));
 
@@ -69,8 +69,8 @@ class VehicleSpecificationServiceTest {
 
         var result = service.query(request);
 
-        assertThat(result.attributes().get("Motor")).isEqualTo("V6 3.0L Nano bi turbo");
-        assertThat(result.sources().get("Motor")).isEqualTo("INTERNAL_OVERRIDE");
+        assertThat(result.attributes().get("Motor")).isEqualTo("V6 3.0");
+        assertThat(result.sources().get("Motor")).isEqualTo("CAR_API");
         assertThat(result.attributes().get("Modos de conducao")).isEqualTo("Nao disponivel");
         assertThat(result.sources().get("Modos de conducao")).isEqualTo("NOT_FOUND");
 
@@ -101,6 +101,38 @@ class VehicleSpecificationServiceTest {
         assertThat(result.sources().get("Preco de referencia")).isEqualTo("FIPE");
         assertThat(result.attributes().get("Codigo FIPE")).isEqualTo("001234-5");
         assertThat(result.sources().get("Codigo FIPE")).isEqualTo("FIPE");
+    }
+
+    @Test
+    void shouldUseInternalDataSourceWhenNotFoundInFipeAndCarApi() {
+        when(carApiClient.searchTechnicalAttributes("Ford", "Ranger", "Raptor", null))
+            .thenReturn(Map.of());
+
+        stubFipePriceLookup();
+
+        var override = new VehicleEnrichmentOverride();
+        override.setBrand("Ford");
+        override.setModel("Ranger");
+        override.setVersion("Raptor");
+        override.setAttributeName("Motor");
+        override.setAttributeValue("V6 3.0L Nano bi turbo");
+
+        when(overrideRepository.findByBrandIgnoreCaseAndModelIgnoreCaseAndVersionIgnoreCase("Ford", "Ranger", "Raptor"))
+            .thenReturn(List.of(override));
+
+        var request = new VehicleQueryRequest(
+            "Ford",
+            "Ranger",
+            "Raptor",
+            "cars",
+            null,
+            List.of("Motor")
+        );
+
+        var result = service.query(request);
+
+        assertThat(result.attributes().get("Motor")).isEqualTo("V6 3.0L Nano bi turbo");
+        assertThat(result.sources().get("Motor")).isEqualTo("INTERNAL_DATA_SOURCE");
     }
 
     private void stubFipePriceLookup() {
