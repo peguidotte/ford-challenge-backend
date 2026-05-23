@@ -2,7 +2,6 @@ package br.com.fiap.fordchallengebackend.integration.carapi;
 
 import br.com.fiap.fordchallengebackend.config.AppProperties;
 import br.com.fiap.fordchallengebackend.exception.ExternalIntegrationException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -19,16 +18,15 @@ import org.springframework.web.client.RestClientResponseException;
 public class CarApiJwtProvider {
 
     private static final int SAFETY_WINDOW_SECONDS = 120;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final AppProperties appProperties;
-    private final ObjectMapper objectMapper;
 
     private volatile String cachedJwt;
     private volatile Instant jwtExpiresAt = Instant.EPOCH;
 
-    public CarApiJwtProvider(AppProperties appProperties, ObjectMapper objectMapper) {
+    public CarApiJwtProvider(AppProperties appProperties) {
         this.appProperties = appProperties;
-        this.objectMapper = objectMapper;
     }
 
     public String getBearerToken() {
@@ -109,7 +107,7 @@ public class CarApiJwtProvider {
             var payloadPart = padBase64(parts[1]);
             var payloadBytes = Base64.getUrlDecoder().decode(payloadPart);
             var payloadJson = new String(payloadBytes, StandardCharsets.UTF_8);
-            JsonNode node = objectMapper.readTree(payloadJson);
+            var node = OBJECT_MAPPER.readTree(payloadJson);
             if (!node.hasNonNull("exp")) {
                 return Optional.empty();
             }
