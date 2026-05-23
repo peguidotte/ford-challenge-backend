@@ -32,5 +32,6 @@ app:
       timeout-millis: 5000
     carapi:
       base-url: ${CAR_API_BASE_URL:https://carapi.app/api}
-      bearer-token: ${CAR_API_BEARER_TOKEN:}
+      api-token: ${CAR_API_API_TOKEN:}
+      api-secret: ${CAR_API_API_SECRET:}
       timeout-millis: 5000

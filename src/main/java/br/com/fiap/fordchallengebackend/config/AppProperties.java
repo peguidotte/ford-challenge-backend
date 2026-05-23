@@ -22,7 +22,8 @@ public record AppProperties(
 
     public record CarApiProperties(
         String baseUrl,
-        String bearerToken,
+        String apiToken,
+        String apiSecret,
         int timeoutMillis
     ) {
     }

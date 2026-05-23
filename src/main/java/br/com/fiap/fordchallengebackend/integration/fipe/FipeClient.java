@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 import br.com.fiap.fordchallengebackend.dto.FipeBrandResponse;
 import br.com.fiap.fordchallengebackend.dto.FipeModelResponse;
@@ -34,6 +35,16 @@ public class FipeClient {
                 .retrieve()
                 .body(new org.springframework.core.ParameterizedTypeReference<>() {
                 });
+        } catch (RestClientResponseException ex) {
+            if (shouldRetryWithoutReference(reference, ex)) {
+                return getBrands(vehicleType, null);
+            }
+            throw new ExternalIntegrationException(
+                "Falha ao consultar marcas na FIPE",
+                ex,
+                ex.getStatusCode().value(),
+                ex.getResponseBodyAsString()
+            );
         } catch (RestClientException ex) {
             throw new ExternalIntegrationException("Falha ao consultar marcas na FIPE", ex);
         }
@@ -50,6 +61,16 @@ public class FipeClient {
                 .retrieve()
                 .body(new org.springframework.core.ParameterizedTypeReference<>() {
                 });
+        } catch (RestClientResponseException ex) {
+            if (shouldRetryWithoutReference(reference, ex)) {
+                return getModels(vehicleType, brandId, null);
+            }
+            throw new ExternalIntegrationException(
+                "Falha ao consultar modelos na FIPE",
+                ex,
+                ex.getStatusCode().value(),
+                ex.getResponseBodyAsString()
+            );
         } catch (RestClientException ex) {
             throw new ExternalIntegrationException("Falha ao consultar modelos na FIPE", ex);
         }
@@ -66,6 +87,16 @@ public class FipeClient {
                 .retrieve()
                 .body(new org.springframework.core.ParameterizedTypeReference<>() {
                 });
+        } catch (RestClientResponseException ex) {
+            if (shouldRetryWithoutReference(reference, ex)) {
+                return getYears(vehicleType, brandId, modelId, null);
+            }
+            throw new ExternalIntegrationException(
+                "Falha ao consultar anos na FIPE",
+                ex,
+                ex.getStatusCode().value(),
+                ex.getResponseBodyAsString()
+            );
         } catch (RestClientException ex) {
             throw new ExternalIntegrationException("Falha ao consultar anos na FIPE", ex);
         }
@@ -81,8 +112,22 @@ public class FipeClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .body(FipePriceResponse.class);
+        } catch (RestClientResponseException ex) {
+            if (shouldRetryWithoutReference(reference, ex)) {
+                return getPrice(vehicleType, brandId, modelId, yearId, null);
+            }
+            throw new ExternalIntegrationException(
+                "Falha ao consultar preco na FIPE",
+                ex,
+                ex.getStatusCode().value(),
+                ex.getResponseBodyAsString()
+            );
         } catch (RestClientException ex) {
             throw new ExternalIntegrationException("Falha ao consultar preco na FIPE", ex);
         }
+    }
+
+    private boolean shouldRetryWithoutReference(Integer reference, RestClientResponseException ex) {
+        return reference != null && ex.getStatusCode().value() == 402;
     }
 }

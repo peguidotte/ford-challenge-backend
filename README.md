@@ -35,6 +35,10 @@ O script tenta compilar primeiro com `java.version=25`. Se nao conseguir, faz fa
 - UI: `http://localhost:8080/swagger-ui.html`
 - OpenAPI: `http://localhost:8080/v3/api-docs`
 
+## Postman
+- Collection pronta para importacao: [postman/ford-challenge-backend.postman_collection.json](postman/ford-challenge-backend.postman_collection.json)
+- A collection ja vem com `baseUrl` e exemplos de payload para uso rapido em ambiente local.
+
 ## Endpoints iniciais
 - `GET /api/v1/health`
 - `POST /api/v1/vehicle-specs/query`

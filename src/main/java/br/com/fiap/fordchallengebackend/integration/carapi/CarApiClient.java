@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 @Component
 public class CarApiClient {
@@ -48,6 +49,13 @@ public class CarApiClient {
             mapIfPresent(bestTrim, normalized, "torque_ft_lbs", "Torque");
 
             return normalized;
+        } catch (RestClientResponseException ex) {
+            throw new ExternalIntegrationException(
+                "Falha ao consultar especificacoes no CarAPI",
+                ex,
+                ex.getStatusCode().value(),
+                ex.getResponseBodyAsString()
+            );
         } catch (RestClientException ex) {
             throw new ExternalIntegrationException("Falha ao consultar especificacoes no CarAPI", ex);
         }

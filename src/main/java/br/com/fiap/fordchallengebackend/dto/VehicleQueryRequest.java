@@ -12,7 +12,7 @@ public record VehicleQueryRequest(
     @NotBlank @Schema(example = "Ranger") String model,
     @NotBlank @Schema(example = "Raptor") String version,
     @Schema(example = "cars", defaultValue = "cars") String vehicleType,
-    @Schema(example = "308", description = "Referencia FIPE opcional") Integer reference,
+    @Schema(example = "333", description = "Referencia FIPE opcional") Integer reference,
     @NotEmpty List<@NotBlank String> attributes
 ) {
 }

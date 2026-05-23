@@ -4,6 +4,7 @@ import br.com.fiap.fordchallengebackend.dto.ApiErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,10 +35,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExternalIntegrationException.class)
     public ResponseEntity<ApiErrorResponse> handleExternal(ExternalIntegrationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ApiErrorResponse(
-            HttpStatus.BAD_GATEWAY.value(),
-            HttpStatus.BAD_GATEWAY.getReasonPhrase(),
-            ex.getMessage(),
+        var status = ex.upstreamStatus() != null
+            ? HttpStatusCode.valueOf(ex.upstreamStatus())
+            : HttpStatus.BAD_GATEWAY;
+
+        var reason = HttpStatus.resolve(status.value()) != null
+            ? HttpStatus.resolve(status.value()).getReasonPhrase()
+            : "Upstream Error";
+
+        var message = ex.getMessage();
+        if (ex.upstreamBody() != null && !ex.upstreamBody().isBlank()) {
+            message = message + " | upstream: " + ex.upstreamBody();
+        }
+
+        return ResponseEntity.status(status).body(new ApiErrorResponse(
+            status.value(),
+            reason,
+            message,
             OffsetDateTime.now()
         ));
     }

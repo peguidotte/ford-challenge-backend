@@ -1,0 +1,234 @@
+{
+  "info": {
+    "_postman_id": "b3d0d5d6-4f5f-4c84-9f5a-6c0c6a7f2d11",
+    "name": "Ford Challenge Backend API",
+    "description": "Collection Postman para consumir a API do Ford Challenge Backend. Use a variavel `baseUrl` para apontar para o ambiente local ou homologacao.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Healthcheck",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "health"
+              ]
+            },
+            "description": "Retorna o status basico da aplicacao."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Specifications",
+      "item": [
+        {
+          "name": "Consolidar especificacoes tecnicas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Ford\",\n  \"model\": \"Ranger\",\n  \"version\": \"Raptor\",\n  \"vehicleType\": \"cars\",\n  \"reference\": 308,\n  \"attributes\": [\n    \"Motor\",\n    \"Potencia\",\n    \"Torque\",\n    \"Transmissao\",\n    \"Modos de conducao\",\n    \"Preco de referencia\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/vehicle-specs/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "vehicle-specs",
+                "query"
+              ]
+            },
+            "description": "Consolida marca, modelo, versao e lista dinamica de atributos tecnicos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "FIPE Catalog",
+      "item": [
+        {
+          "name": "Listar marcas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/fipe/brands?vehicleType={{vehicleType}}&reference={{reference}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "fipe",
+                "brands"
+              ],
+              "query": [
+                {
+                  "key": "vehicleType",
+                  "value": "{{vehicleType}}"
+                },
+                {
+                  "key": "reference",
+                  "value": "{{reference}}"
+                }
+              ]
+            },
+            "description": "Lista marcas FIPE por tipo de veiculo."
+          }
+        },
+        {
+          "name": "Listar modelos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/fipe/brands/{{brandId}}/models?vehicleType={{vehicleType}}&reference={{reference}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "fipe",
+                "brands",
+                "{{brandId}}",
+                "models"
+              ],
+              "query": [
+                {
+                  "key": "vehicleType",
+                  "value": "{{vehicleType}}"
+                },
+                {
+                  "key": "reference",
+                  "value": "{{reference}}"
+                }
+              ]
+            },
+            "description": "Lista modelos FIPE por marca."
+          }
+        },
+        {
+          "name": "Listar anos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/fipe/brands/{{brandId}}/models/{{modelId}}/years?vehicleType={{vehicleType}}&reference={{reference}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "fipe",
+                "brands",
+                "{{brandId}}",
+                "models",
+                "{{modelId}}",
+                "years"
+              ],
+              "query": [
+                {
+                  "key": "vehicleType",
+                  "value": "{{vehicleType}}"
+                },
+                {
+                  "key": "reference",
+                  "value": "{{reference}}"
+                }
+              ]
+            },
+            "description": "Lista anos/versoes FIPE por modelo."
+          }
+        },
+        {
+          "name": "Consultar preco",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/fipe/brands/{{brandId}}/models/{{modelId}}/years/{{yearId}}?vehicleType={{vehicleType}}&reference={{reference}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "fipe",
+                "brands",
+                "{{brandId}}",
+                "models",
+                "{{modelId}}",
+                "years",
+                "{{yearId}}"
+              ],
+              "query": [
+                {
+                  "key": "vehicleType",
+                  "value": "{{vehicleType}}"
+                },
+                {
+                  "key": "reference",
+                  "value": "{{reference}}"
+                }
+              ]
+            },
+            "description": "Consulta o preco FIPE para uma versao de ano."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "vehicleType",
+      "value": "cars"
+    },
+    {
+      "key": "reference",
+      "value": "308"
+    },
+    {
+      "key": "brandId",
+      "value": "1"
+    },
+    {
+      "key": "modelId",
+      "value": "1"
+    },
+    {
+      "key": "yearId",
+      "value": "2024-1"
+    }
+  ]
+}

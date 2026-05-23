@@ -43,6 +43,45 @@ function Resolve-JavaVersionForBuild {
     throw "Nao foi possivel compilar com Java 25 nem Java 21. Verifique a instalacao do JDK."
 }
 
+function Configure-JavaHomeForBuild {
+    Write-Step "Configurando JAVA_HOME para build local"
+
+    $candidates = @()
+
+    if ($env:JAVA25_HOME -and (Test-Path (Join-Path $env:JAVA25_HOME "bin\java.exe"))) {
+        $candidates += $env:JAVA25_HOME
+    }
+
+    $candidates += @(Get-ChildItem "C:\Program Files\Eclipse Adoptium" -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -like "jdk-25*" } |
+        Sort-Object Name -Descending |
+        Select-Object -ExpandProperty FullName)
+
+    $candidates += @(Get-ChildItem "C:\Program Files\Java" -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -like "jdk-25*" } |
+        Sort-Object Name -Descending |
+        Select-Object -ExpandProperty FullName)
+
+    $latestJava = "C:\Program Files\Java\latest"
+    if (Test-Path (Join-Path $latestJava "bin\java.exe")) {
+        $candidates += $latestJava
+    }
+
+    $selected = $candidates |
+        Where-Object { $_ -and (Test-Path (Join-Path $_ "bin\java.exe")) } |
+        Select-Object -First 1
+
+    if (-not $selected) {
+        Write-Host "Nao foi encontrado JDK 25 automaticamente. Mantendo JAVA_HOME atual." -ForegroundColor Yellow
+        return
+    }
+
+    $env:JAVA_HOME = $selected
+    $env:Path = "$selected\bin;$env:Path"
+    Write-Host "JAVA_HOME configurado para: $selected" -ForegroundColor Green
+    & java -version | Out-Host
+}
+
 function Wait-ForDocker {
     param(
         [int]$TimeoutSeconds = 60,
@@ -80,6 +119,8 @@ if (-not (Test-Path ".env")) {
 }
 
 Wait-ForDocker -TimeoutSeconds 60 -RetryIntervalSeconds 3
+
+Configure-JavaHomeForBuild
 
 Write-Step "Subindo PostgreSQL com Docker Compose"
 & docker compose --env-file .env up -d
