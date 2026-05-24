@@ -15,6 +15,7 @@ target/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+.github
 
 ### Eclipse ###
 .apt_generated

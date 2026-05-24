@@ -5,13 +5,212 @@
     "description": "Collection Postman para consumir a API do Ford Challenge Backend. Use a variavel `baseUrl` para apontar para o ambiente local ou homologacao.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
   "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "if (jsonData.accessToken) {",
+                  "  pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+                  "}",
+                  "",
+                  "if (jsonData.refreshToken) {",
+                  "  pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                  "}",
+                  "",
+                  "if (jsonData.email) {",
+                  "  pm.collectionVariables.set('currentUserEmail', jsonData.email);",
+                  "}",
+                  "",
+                  "if (jsonData.role) {",
+                  "  pm.collectionVariables.set('currentUserRole', jsonData.role);",
+                  "}",
+                  "",
+                  "pm.test('Access token retornado', function () {",
+                  "  pm.expect(jsonData.accessToken).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"password\": \"{{loginPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Autentica usuario e salva accessToken/refreshToken nas variaveis da collection."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "if (jsonData.accessToken) {",
+                  "  pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+                  "}",
+                  "",
+                  "pm.test('Novo access token retornado', function () {",
+                  "  pm.expect(jsonData.accessToken).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Renova o access token usando o refreshToken salvo na collection."
+          },
+          "response": []
+        },
+        {
+          "name": "Register User (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Novo Usuario\",\n  \"email\": \"novo.usuario@fordchallenge.com\",\n  \"password\": \"password123\",\n  \"role\": \"ROLE_USER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Cadastra usuario. Exige Authorization Bearer com token de ADMIN."
+          },
+          "response": []
+        },
+        {
+          "name": "Register Admin (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Novo Admin\",\n  \"email\": \"novo.admin@fordchallenge.com\",\n  \"password\": \"admin123\",\n  \"role\": \"ROLE_ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Cadastra outro ADMIN. Exige token de ADMIN no Authorization Bearer."
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "Health",
       "item": [
         {
           "name": "Healthcheck",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -209,6 +408,30 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:8080"
+    },
+    {
+      "key": "loginEmail",
+      "value": "admin@fordchallenge.com"
+    },
+    {
+      "key": "loginPassword",
+      "value": "admin123"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "currentUserEmail",
+      "value": ""
+    },
+    {
+      "key": "currentUserRole",
+      "value": ""
     },
     {
       "key": "vehicleType",
