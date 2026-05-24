@@ -11,6 +11,7 @@ import br.com.fiap.fordchallengebackend.integration.carapi.CarApiClient;
 import br.com.fiap.fordchallengebackend.integration.fipe.FipeClient;
 import br.com.fiap.fordchallengebackend.repository.VehicleEnrichmentOverrideRepository;
 import br.com.fiap.fordchallengebackend.repository.VehicleQueryHistoryRepository;
+import br.com.fiap.fordchallengebackend.validation.Sanitizer;
 import java.text.Normalizer;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -79,20 +80,20 @@ public class VehicleSpecificationService {
 
             var mappedFipeKey = mapToFipeCanonical(normalized);
             if (normalizedFipeData.containsKey(mappedFipeKey)) {
-                resolvedAttributes.put(requested, normalizedFipeData.get(mappedFipeKey));
+                resolvedAttributes.put(requested, Sanitizer.sanitizeAll(normalizedFipeData.get(mappedFipeKey)));
                 mergedSources.put(requested, "FIPE");
                 continue;
             }
 
             var mappedCarApiKey = mapToCarApiCanonical(normalized);
             if (normalizedCarApiData.containsKey(mappedCarApiKey)) {
-                resolvedAttributes.put(requested, normalizedCarApiData.get(mappedCarApiKey));
+                resolvedAttributes.put(requested, Sanitizer.sanitizeAll(normalizedCarApiData.get(mappedCarApiKey)));
                 mergedSources.put(requested, "CAR_API");
                 continue;
             }
 
             if (overrideMap.containsKey(normalized)) {
-                resolvedAttributes.put(requested, overrideMap.get(normalized));
+                resolvedAttributes.put(requested, Sanitizer.sanitizeAll(overrideMap.get(normalized)));
                 mergedSources.put(requested, "INTERNAL_DATA_SOURCE");
                 continue;
             }
@@ -247,7 +248,7 @@ public class VehicleSpecificationService {
         var ordered = new LinkedHashSet<String>();
         attributes.forEach(attribute -> {
             if (attribute != null && !attribute.isBlank()) {
-                ordered.add(attribute.trim());
+                ordered.add(Sanitizer.sanitizeAll(attribute.trim()));
             }
         });
         return ordered;
@@ -306,8 +307,8 @@ public class VehicleSpecificationService {
 
         attributes.forEach((attributeName, attributeValue) -> {
             var item = new VehicleQueryAttributeResult();
-            item.setAttributeName(attributeName);
-            item.setAttributeValue(attributeValue);
+            item.setAttributeName(Sanitizer.sanitizeAll(attributeName));
+            item.setAttributeValue(Sanitizer.sanitizeAll(attributeValue));
             item.setDataSource(sources.getOrDefault(attributeName, "UNKNOWN"));
             history.addAttribute(item);
         });

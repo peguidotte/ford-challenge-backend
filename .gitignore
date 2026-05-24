@@ -39,5 +39,8 @@ target/
 .DS_Store
 Thumbs.db
 
+### Keystore ###
+src/main/resources/keystore/
+
 ### Env ###
 .env

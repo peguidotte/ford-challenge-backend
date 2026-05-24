@@ -41,10 +41,6 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new BadCredentialsException("Erro no cadastro");
-        }
-
         var role = parseRole(request.role());
 
         var user = new User();

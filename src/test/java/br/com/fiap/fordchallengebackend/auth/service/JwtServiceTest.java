@@ -21,6 +21,7 @@ class JwtServiceTest {
             "dGhpcyBpcyBhIHZlcnkgc2VjdXJlIGtleSBmb3IgdGVzdGluZyBwdXJwb3NlcyBvbmx5",
             900000L,
             604800000L,
+            "",
             List.of("*")
         );
         jwtService = new JwtService(securityProperties);

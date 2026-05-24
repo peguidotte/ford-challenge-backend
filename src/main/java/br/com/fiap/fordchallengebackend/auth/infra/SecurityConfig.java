@@ -1,7 +1,10 @@
 package br.com.fiap.fordchallengebackend.auth.infra;
 
+import br.com.fiap.fordchallengebackend.security.PayloadSigningFilter;
+import br.com.fiap.fordchallengebackend.security.RateLimitingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,10 +28,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitingFilter rateLimitingFilter;
+    private final PayloadSigningFilter payloadSigningFilter;
     private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, RateLimitingFilter rateLimitingFilter, PayloadSigningFilter payloadSigningFilter, UserDetailsService userDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.rateLimitingFilter = rateLimitingFilter;
+        this.payloadSigningFilter = payloadSigningFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -46,7 +53,9 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())
             .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(payloadSigningFilter, JwtAuthenticationFilter.class)
+            .addFilterBefore(rateLimitingFilter, PayloadSigningFilter.class);
 
         return http.build();
     }

@@ -108,6 +108,6 @@ class VehicleSpecificationControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadGateway())
             .andExpect(jsonPath("$.status").value(502))
-            .andExpect(jsonPath("$.message").value("Falha externa"));
+            .andExpect(jsonPath("$.message").value("Erro ao consultar servico externo"));
     }
 }

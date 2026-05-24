@@ -9,6 +9,7 @@ public record SecurityProperties(
     String jwtSecret,
     long jwtExpirationMs,
     long jwtRefreshExpirationMs,
+    String payloadSecret,
     List<String> corsAllowedOrigins
 ) {
 }

@@ -16,7 +16,7 @@ spring:
       hibernate:
         format_sql: true
   flyway:
-    enabled: true
+    enabled: false
 
 management:
   endpoints:
@@ -29,6 +29,7 @@ app:
     jwt-secret: ${APP_JWT_SECRET:dGhpcyBpcyBhIHZlcnkgc2VjdXJlIGtleSBmb3IgdGVzdGluZyBwdXJwb3NlcyBvbmx5}
     jwt-expiration-ms: 900000
     jwt-refresh-expiration-ms: 604800000
+    payload-secret: ${APP_PAYLOAD_SECRET:}
     cors-allowed-origins:
       - "http://localhost:3000"
       - "http://localhost:5173"
@@ -43,3 +44,22 @@ app:
       api-token: ${CAR_API_API_TOKEN:}
       api-secret: ${CAR_API_API_SECRET:}
       timeout-millis: 5000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: ssl
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store-type: PKCS12
+    key-store: classpath:keystore/ford-challenge-dev.p12
+    key-store-password: changeit
+    key-alias: ford-challenge-dev
+    enabled-protocols: TLSv1.2,TLSv1.3
+    ciphers: >-
+      TLS_AES_256_GCM_SHA384,
+      TLS_AES_128_GCM_SHA256,
+      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
