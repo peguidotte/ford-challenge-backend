@@ -2,6 +2,7 @@ package br.com.fiap.fordchallengebackend.config;
 
 import java.time.Duration;
 
+import br.com.fiap.fordchallengebackend.auth.config.SecurityProperties;
 import br.com.fiap.fordchallengebackend.integration.carapi.CarApiJwtProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +11,7 @@ import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-@EnableConfigurationProperties(AppProperties.class)
+@EnableConfigurationProperties({AppProperties.class, SecurityProperties.class})
 public class ApplicationConfig {
 
     @Bean

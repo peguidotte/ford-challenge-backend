@@ -25,6 +25,14 @@ management:
         include: health,info
 
 app:
+  security:
+    jwt-secret: ${APP_JWT_SECRET:dGhpcyBpcyBhIHZlcnkgc2VjdXJlIGtleSBmb3IgdGVzdGluZyBwdXJwb3NlcyBvbmx5}
+    jwt-expiration-ms: 900000
+    jwt-refresh-expiration-ms: 604800000
+    cors-allowed-origins:
+      - "http://localhost:3000"
+      - "http://localhost:5173"
+      - "https://app.fordchallenge.com"
   integration:
     fipe:
       base-url: ${FIPE_BASE_URL:https://fipe.parallelum.com.br/api/v2}

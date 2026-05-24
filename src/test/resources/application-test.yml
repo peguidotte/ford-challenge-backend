@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+  flyway:
+    enabled: false
+
+app:
+  integration:
+    fipe:
+      base-url: http://localhost:9999
+      token: test-token
+      timeout-millis: 1000
+    carapi:
+      base-url: http://localhost:9999
+      api-token: test-token
+      api-secret: test-secret
+      timeout-millis: 1000

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ public class VehicleSpecificationController {
     }
 
     @PostMapping("/query")
+    @PreAuthorize("hasAnyRole('USER', 'ANALYST', 'ADMIN')")
     @Operation(summary = "Consolida atributos tecnicos por marca, modelo, versao e lista dinamica de atributos")
     public ResponseEntity<VehicleQueryResponse> query(@Valid @RequestBody VehicleQueryRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(vehicleSpecificationService.query(request));
